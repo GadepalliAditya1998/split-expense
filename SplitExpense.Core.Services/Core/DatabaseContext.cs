@@ -34,6 +34,12 @@ namespace SplitExpense.Core.Services.Core
             return this.db.Update(data, columns);
         }
 
+        public int Update<T>(string query, params object[] whereArgs)
+        {
+            var sql = new Sql(query, whereArgs);
+            return this.db.Update<T>(sql);
+        }
+
         public int Delete<T>(T data)
         {
             return this.db.Delete<T>(data);
@@ -44,9 +50,46 @@ namespace SplitExpense.Core.Services.Core
             return this.db.Fetch<T>(query, args);
         }
 
+        public T SingleOrDefault<T>(string query, params object[] args)
+        {
+            return this.db.SingleOrDefault<T>(query, args);
+        }
+
         public bool Exists<T>(string query, params object[] args)
         {
             return this.db.Exists<T>(query, args);
+        }
+
+        public void BulkInsert<T>(List<T> data)
+        {
+            try
+            {
+                this.db.BeginTransaction();
+                foreach (var record in data)
+                {
+                    this.db.Insert(record);
+                }
+                this.db.CompleteTransaction();
+            }catch(Exception e)
+            {
+                this.db.AbortTransaction();
+                throw;
+            }
+        }
+
+        public void BeginTransaction()
+        {
+            this.db.BeginTransaction();
+        }
+
+        public void CompleteTransaction()
+        {
+            this.db.CompleteTransaction();
+        }
+
+        public void AbortTransaction()
+        {
+            this.db.AbortTransaction();
         }
     }
 }

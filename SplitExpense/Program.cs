@@ -1,3 +1,4 @@
+using SplitExpense.Core.Services;
 using SplitExpense.Core.Services.Core;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,4 +33,6 @@ app.Run();
 void ConfigireServices()
 {
     builder.Services.AddScoped<DatabaseContext>(db => new DatabaseContext(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+    builder.Services.AddScoped<ExpenseService>();
+    builder.Services.AddScoped<ExpenseGroupService>();
 }

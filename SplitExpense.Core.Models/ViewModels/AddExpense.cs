@@ -10,7 +10,7 @@ namespace SplitExpense.Core.Models.ViewModels
     {
         public AddExpense()
         {
-            this.ExpenseUsers = new List<int>();
+            this.ExpenseUsers = new List<ExpenseUserShare>();
         }
 
         public int Id { get; set; }
@@ -25,6 +25,6 @@ namespace SplitExpense.Core.Models.ViewModels
 
         public double Amount { get; set; }
 
-        public List<int> ExpenseUsers { get; set; }
+        public List<ExpenseUserShare> ExpenseUsers { get; set; }
     }
 }

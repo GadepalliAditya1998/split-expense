@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="PetaPoco.Compiled" Version="6.0.532" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
   </ItemGroup>
 
   <ItemGroup>
