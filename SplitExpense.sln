@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitExpense", "SplitExpense\SplitExpense.csproj", "{62ED9766-6ACD-4BB6-98E9-D1F33C05B5B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SplitExpense", "SplitExpense\SplitExpense.csproj", "{62ED9766-6ACD-4BB6-98E9-D1F33C05B5B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitExpense.Core.Services", "SplitExpense.Core.Services\SplitExpense.Core.Services.csproj", "{38900CC3-02C3-4EC8-9887-26C2CDCFD8A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitExpense.Core.Models", "SplitExpense.Core.Models\SplitExpense.Core.Models.csproj", "{F4F514CB-F6FE-4276-AFDD-5F757DDED5AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{62ED9766-6ACD-4BB6-98E9-D1F33C05B5B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62ED9766-6ACD-4BB6-98E9-D1F33C05B5B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62ED9766-6ACD-4BB6-98E9-D1F33C05B5B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38900CC3-02C3-4EC8-9887-26C2CDCFD8A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38900CC3-02C3-4EC8-9887-26C2CDCFD8A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38900CC3-02C3-4EC8-9887-26C2CDCFD8A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38900CC3-02C3-4EC8-9887-26C2CDCFD8A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4F514CB-F6FE-4276-AFDD-5F757DDED5AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4F514CB-F6FE-4276-AFDD-5F757DDED5AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4F514CB-F6FE-4276-AFDD-5F757DDED5AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4F514CB-F6FE-4276-AFDD-5F757DDED5AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

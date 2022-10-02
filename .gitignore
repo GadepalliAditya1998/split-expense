@@ -1,1 +1,10 @@
 .vs/*
+SplitExpense/bin/*
+SplitExpense/obj/*
+SplitExpense/.vs/*
+
+SplitExpense.Core.Services/bin/*
+SplitExpense.Core.Services/obj/*
+
+SplitExpense.Core.Models/bin/*
+SplitExpense.Core.Models/obj/*
