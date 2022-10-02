@@ -94,6 +94,16 @@ namespace SplitExpense.Core.Services
             return expenseUsers;
         }
 
+        public IEnumerable<GroupExpenseListItem> GetGroupUserExpenseListItem(int groupId, int userId)
+        {
+            if (!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
+            {
+                throw new Exception("Group doesn't exists");
+            }
+
+            return this.DB.Fetch<GroupExpenseListItem>(";EXEC [GetGroupExpenseListItems] @@GroupId = @0, @@UserId = @1", groupId, userId);
+        }
+
         public IEnumerable<Expense> GetExpenses()
         {
             return this.DB.Fetch<Expense>(string.Empty);

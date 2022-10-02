@@ -33,6 +33,8 @@ app.Run();
 void ConfigireServices()
 {
     builder.Services.AddScoped<DatabaseContext>(db => new DatabaseContext(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+    builder.Services.AddSingleton<IConfiguration>(c => builder.Configuration);
     builder.Services.AddScoped<ExpenseService>();
     builder.Services.AddScoped<ExpenseGroupService>();
+    builder.Services.AddScoped<UserInviteService>();
 }

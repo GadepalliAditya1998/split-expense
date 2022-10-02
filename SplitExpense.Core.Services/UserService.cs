@@ -8,5 +8,6 @@ namespace SplitExpense.Core.Services
 {
     public class UserService
     {
+
     }
 }

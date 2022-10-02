@@ -12,4 +12,10 @@ namespace SplitExpense.Core.Models
         Individual,
         Custom
     }
+
+    public enum InviteType
+    {
+        App,
+        Group
+    }
 }

@@ -37,7 +37,7 @@ namespace SplitExpense.Controllers
         [HttpPost("{groupId}/adduser")]
         public int AddGroupUser(ExpenseGroupUser user)
         {
-
+            return 0;
         }
     }
 }

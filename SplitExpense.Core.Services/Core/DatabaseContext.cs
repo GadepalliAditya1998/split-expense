@@ -55,6 +55,11 @@ namespace SplitExpense.Core.Services.Core
             return this.db.SingleOrDefault<T>(query, args);
         }
 
+        public T FirstOrDefault<T>(string query, params object[] args)
+        {
+            return this.db.FirstOrDefault<T>(query, args);
+        }
+
         public bool Exists<T>(string query, params object[] args)
         {
             return this.db.Exists<T>(query, args);
