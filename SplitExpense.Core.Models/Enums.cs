@@ -6,5 +6,10 @@ using System.Threading.Tasks;
 
 namespace SplitExpense.Core.Models
 {
-
+    public enum ExpenseSplitType
+    {
+        Equally,
+        Individual,
+        Custom
+    }
 }
