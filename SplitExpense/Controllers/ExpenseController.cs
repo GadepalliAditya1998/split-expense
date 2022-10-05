@@ -30,7 +30,13 @@ namespace SplitExpense
         [HttpPost("/group/{groupId}/list")]
         public IEnumerable<GroupExpenseListItem> GetGroupExpenses(int groupId)
         {
-            return this.expenseService.GetGroupUserExpenseListItem(groupId, 1);
+            return this.expenseService.GetGroupUserExpenseListItem(groupId, this.ContextUser.Id);
+        }
+
+        [HttpPost("/group/{groupId}/balances")]
+        public IEnumerable<ExpenseGroupUserBalanceListItem> GetGroupUserWiseBalances(int groupId)
+        {
+            return this.expenseService.GetGroupUserWiseBalances(groupId, this.ContextUser.Id);
         }
 
         [HttpPost("{expenseId}/delete")]

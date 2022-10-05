@@ -16,15 +16,13 @@ namespace SplitExpense.Controllers
         [HttpGet("app")]
         public string GetUserApplicationInviteURL()
         {
-            int currentUser = 1;
-            return this.userInviteService.GetApplicationUserInvite(currentUser);
+            return this.userInviteService.GetApplicationUserInvite(this.ContextUser.Id);
         }
 
         [HttpGet("group/{groupId}")]
         public string GetUserGroupInviteURL(int groupId)
         {
-            int currentUser = 1;
-            return this.userInviteService.GetGroupUserInvite(currentUser, groupId);
+            return this.userInviteService.GetGroupUserInvite(this.ContextUser.Id, groupId);
         }
 
         [HttpGet("app/{inviteId}/verify")]

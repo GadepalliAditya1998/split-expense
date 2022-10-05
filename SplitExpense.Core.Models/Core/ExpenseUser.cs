@@ -12,6 +12,8 @@ namespace SplitExpense.Core.Models.Core
 
         public int ExpenseId { get; set; }
 
+        public int UserId { get; set; }
+
         public Double Amount { get; set; }
     }
 }

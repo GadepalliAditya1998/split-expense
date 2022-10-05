@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SplitExpense.Core.Models
+﻿namespace SplitExpense.Core.Models.Core.Database
 {
     public class User
     {
@@ -19,6 +13,8 @@ namespace SplitExpense.Core.Models
         public DateTime DateOfBirth { get; set; }
 
         public string Email { get; set; }
+
+        public string Password { get; set; }
 
         public Guid? ReferralId { get; set; }
 

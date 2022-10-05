@@ -16,6 +16,7 @@ namespace SplitExpense.Core.Services
 
         public int AddExpense(AddExpense expense)
         {
+            int currentUserId = 1;
             var expenseUsers = this.GetExpenseUser(expense).ToList();
             if (!expenseUsers.Any())
             {
@@ -26,7 +27,18 @@ namespace SplitExpense.Core.Services
             {
                 this.DB.BeginTransaction();
 
-                int expenseId = this.DB.Insert(expense);
+                var newExpense = new Expense()
+                {
+                    Name = expense.Name,
+                    Amount = expense.Amount,
+                    Description = expense.Description,
+                    GroupId = expense.GroupId,
+                    SplitType = expense.SplitType,
+                    PaidByUser = currentUserId,
+                    UserId = currentUserId,
+                };
+
+                int expenseId = this.DB.Insert(newExpense);
                 expenseUsers.ForEach(e =>
                 {
                     e.ExpenseId = expenseId;
@@ -56,7 +68,7 @@ namespace SplitExpense.Core.Services
                             throw new Exception("Group doesn't exists");
                         }
 
-                        var groupUsers = this.DB.Fetch<ExpenseGroupUser>("WHERE @0 AND IsDeleted = @1", expense.GroupId.Value, false);
+                        var groupUsers = this.DB.Fetch<ExpenseGroupUser>("WHERE GroupId = @0 AND IsDeleted = @1", expense.GroupId.Value, false);
                         var sharePerUser = expense.Amount / groupUsers.Count();
 
                         foreach (var user in groupUsers)
@@ -102,6 +114,16 @@ namespace SplitExpense.Core.Services
             }
 
             return this.DB.Fetch<GroupExpenseListItem>(";EXEC [GetGroupExpenseListItems] @@GroupId = @0, @@UserId = @1", groupId, userId);
+        }
+
+        public IEnumerable<ExpenseGroupUserBalanceListItem> GetGroupUserWiseBalances(int groupId, int userId)
+        {
+            if (!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
+            {
+                throw new Exception("Group doesn't exists");
+            }
+
+            return this.DB.Fetch<ExpenseGroupUserBalanceListItem>(";EXEC [GetGroupUserWiseBalances] @@GroupId = @0, @@UserId = @1", groupId, userId);
         }
 
         public IEnumerable<Expense> GetExpenses()
