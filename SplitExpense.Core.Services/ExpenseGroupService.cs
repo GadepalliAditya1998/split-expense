@@ -18,9 +18,8 @@ namespace SplitExpense.Core.Services
             this.DB = db;
         }
 
-        public IEnumerable<ExpenseGroup> GetAllGroups()
+        public IEnumerable<ExpenseGroup> GetUserGroups(int userId)
         {
-            int userId = 1;
             return this.DB.Fetch<ExpenseGroup>("WHERE UserId = @0 AND IsDeleted = @1", userId, false);
         }
 

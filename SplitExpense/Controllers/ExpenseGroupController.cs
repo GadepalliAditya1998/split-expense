@@ -16,15 +16,16 @@ namespace SplitExpense.Controllers
             this.expenseGroupService = expenseGroupService;
         }
 
-        [HttpGet("all")]
+        [HttpGet("list")]
         public IEnumerable<ExpenseGroup> GetExpenseGroups()
         {
-            return this.expenseGroupService.GetAllGroups();
+            return this.expenseGroupService.GetUserGroups(this.ContextUser.Id);
         }
 
         [HttpPost("add")]
         public int AddGroup(ExpenseGroup expenseGroup)
         {
+            expenseGroup.UserId = this.ContextUser.Id;
             return this.expenseGroupService.AddGroup(expenseGroup);
         }
 

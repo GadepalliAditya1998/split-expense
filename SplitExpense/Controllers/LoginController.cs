@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services;
+using SplitExpense.Core.Services.Core;
 
 namespace SplitExpense.Controllers
 {
@@ -9,17 +10,22 @@ namespace SplitExpense.Controllers
     public class LoginController : BaseApiController
     {
         private readonly UserService userService;
+        private readonly IConfiguration configurationManager;
 
-        public LoginController(UserService userService)
+        public LoginController(UserService userService, IConfiguration configurationManager)
         {
             this.userService = userService;
+            this.configurationManager = configurationManager;
         }
 
         [HttpPost("")]
         [AllowAnonymous]
-        public string Login(LoginUser loginUser)
+        public object Login(LoginUser loginUser)
         {
-            return this.userService.LoginUser(loginUser);
+            return new
+            {
+                Token = this.userService.LoginUser(loginUser)
+            };
         }
     }
 }
