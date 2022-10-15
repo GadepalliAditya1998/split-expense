@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
+using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services;
 
 namespace SplitExpense.Controllers
@@ -40,5 +41,12 @@ namespace SplitExpense.Controllers
         {
             return this.expenseGroupService.AddGroupUser(groupId, user);
         }
+
+        [HttpGet("{groupId}/members")]
+        public IEnumerable<ExpenseGroupUserListItem> AddGroupUser(int groupId)
+        {
+            return this.expenseGroupService.GetGroupUsers(groupId);
+        }
+
     }
 }

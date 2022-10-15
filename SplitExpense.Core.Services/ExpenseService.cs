@@ -36,6 +36,7 @@ namespace SplitExpense.Core.Services
                     SplitType = expense.SplitType,
                     PaidByUser = currentUserId,
                     UserId = currentUserId,
+                    ExpenseDate = DateTime.UtcNow,
                 };
 
                 int expenseId = this.DB.Insert(newExpense);
@@ -75,7 +76,9 @@ namespace SplitExpense.Core.Services
                         {
                             expenseUsers.Add(new ExpenseUser()
                             {
+                                UserId = user.UserId,
                                 Amount = sharePerUser,
+                                Balance = sharePerUser,
                             });
                         }
 
@@ -86,7 +89,9 @@ namespace SplitExpense.Core.Services
                     {
                         expenseUsers.Add(new ExpenseUser()
                         {
-                            Amount = expense.Amount
+                            UserId = 1, // TODO: change implementation here
+                            Amount = expense.Amount,
+                            Balance = expense.Amount,
                         });
                         break;
                     }
@@ -96,7 +101,9 @@ namespace SplitExpense.Core.Services
                         {
                             expenseUsers.Add(new ExpenseUser()
                             {
-                                Amount = e.Amount
+                                UserId =e.UserId,
+                                Amount = e.Amount,
+                                Balance = e.Amount,
                             });
                         });
                         break;

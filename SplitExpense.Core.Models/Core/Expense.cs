@@ -10,6 +10,8 @@
 
         public string Description { get; set; }
 
+        public DateTime ExpenseDate { get; set; }
+
         public int UserId { get; set; }
 
         public int PaidByUser { get; set; }

@@ -6,6 +6,7 @@
 	UserId			INT				NOT NULL,
 	GroupId			INT				NULL,
 	PaidByUser		INT				NOT NULL,
+	ExpenseDate		DateTime		NOT NULL,
 	Amount			FLOAT			NOT NULL,
 	SplitType		TINYINT			NOT NULL,
 	CreatedBy		NVARCHAR(128)	NOT NULL CONSTRAINT df_expenses_createdby DEFAULT(CURRENT_USER) ,

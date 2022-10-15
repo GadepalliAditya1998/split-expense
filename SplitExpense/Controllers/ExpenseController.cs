@@ -27,25 +27,25 @@ namespace SplitExpense
             return this.expenseService.AddExpense(expense);
         }
 
-        [HttpPost("/group/{groupId}/list")]
+        [HttpGet("group/{groupId}/list")]
         public IEnumerable<GroupExpenseListItem> GetGroupExpenses(int groupId)
         {
             return this.expenseService.GetGroupUserExpenseListItem(groupId, this.ContextUser.Id);
         }
 
-        [HttpPost("/group/{groupId}/balances")]
+        [HttpGet("group/{groupId}/balances")]
         public IEnumerable<ExpenseGroupUserBalanceListItem> GetGroupUserWiseBalances(int groupId)
         {
             return this.expenseService.GetGroupUserWiseBalances(groupId, this.ContextUser.Id);
         }
 
-        [HttpPost("{expenseId}/delete")]
+        [HttpDelete("{expenseId}/delete")]
         public bool DeleteIndividualExpense(int expenseId)
         {
             return this.expenseService.DeleteIndividualExpense(expenseId);
         }
 
-        [HttpPost("groups/{groupId}/{expenseId}/delete")]
+        [HttpDelete("groups/{groupId}/{expenseId}/delete")]
         public bool DeleteGroupExpense(int groupId, int expenseId)
         {
             return this.expenseService.DeleteGroupExpense(groupId, expenseId);

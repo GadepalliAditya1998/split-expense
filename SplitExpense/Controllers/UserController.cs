@@ -29,7 +29,7 @@ namespace SplitExpense.Controllers
             return this.userService.DoesUserExists(user);
         }
 
-        [HttpPost("contextuserdetails")]
+        [HttpGet("contextuserdetails")]
         public User GetContextUserDetails(int userId) 
         {
             return this.userService.GetUserById(this.ContextUser.Id);

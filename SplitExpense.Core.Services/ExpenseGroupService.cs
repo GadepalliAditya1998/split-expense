@@ -1,5 +1,6 @@
 ﻿using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
+using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,16 @@ namespace SplitExpense.Core.Services
             }
 
             return this.DB.Update<ExpenseGroup>("SET IsDeleted = @0, DateDeleted = @1 WHERE Id = @2", true, DateTime.UtcNow, groupId) > 0;
+        }
+
+        public IEnumerable<ExpenseGroupUserListItem> GetGroupUsers(int groupId)
+        {
+            if (!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
+            {
+                throw new Exception("Expense Group doesn't exists");
+            }
+
+            return this.DB.Fetch<ExpenseGroupUserListItem>("WHERE GroupId = @0", groupId);
         }
 
         public int AddGroupUser(int groupId, ExpenseGroupUser groupUser)

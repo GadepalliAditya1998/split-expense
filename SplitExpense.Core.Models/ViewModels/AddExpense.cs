@@ -13,13 +13,11 @@ namespace SplitExpense.Core.Models.ViewModels
             this.ExpenseUsers = new List<ExpenseUserShare>();
         }
 
-        public int Id { get; set; }
-
         public string Name { get; set; }
 
         public int? GroupId { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public ExpenseSplitType SplitType { get; set; }
 
