@@ -1,4 +1,4 @@
-﻿CREATE OR ALTER VIEW ExpenseGroupUserListItems
+﻿CREATE VIEW ExpenseGroupUserListItems
 AS
 SELECT 
 U.Id,
@@ -9,4 +9,4 @@ U.[IsActive],
 U.[Email]
 FROM
 ExpenseGroupUsers EGU
-INNER JOIN Users U ON U.Id = EGU.UserId AND U.IsDeleted = 0 AND EGU.IsDeleted = 0
+INNER JOIN Users U ON U.Id = EGU.UserId AND U.IsDeleted = 0

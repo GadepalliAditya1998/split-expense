@@ -1,4 +1,5 @@
-﻿using SplitExpense.Core.Models;
+﻿using Microsoft.AspNetCore.Http;
+using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
@@ -10,18 +11,18 @@ using System.Threading.Tasks;
 
 namespace SplitExpense.Core.Services
 {
-    public class ExpenseGroupService
+    public class ExpenseGroupService: BaseService
     {
         private readonly DatabaseContext DB;
 
-        public ExpenseGroupService(DatabaseContext db)
+        public ExpenseGroupService(DatabaseContext db, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             this.DB = db;
         }
 
-        public IEnumerable<ExpenseGroup> GetUserGroups(int userId)
+        public IEnumerable<ExpenseUserGroupListItem> GetUserGroups(int userId)
         {
-            return this.DB.Fetch<ExpenseGroup>("WHERE UserId = @0 AND IsDeleted = @1", userId, false);
+            return this.DB.Fetch<ExpenseUserGroupListItem>("WHERE UserId = @0", userId);
         }
 
         public int AddGroup(ExpenseGroup expenseGroup)
@@ -89,7 +90,7 @@ namespace SplitExpense.Core.Services
                 throw new Exception("Expense Group doesn't exists");
             }
 
-            if (this.DB.Exists<ExpenseGroupUser>("WHERE Id = @0 AND IsDeleted = @1 AND UserId = @2", groupId, false, groupUser.UserId))
+            if (this.DB.Exists<ExpenseGroupUser>("WHERE GroupId = @0 AND IsDeleted = @1 AND UserId = @2", groupId, false, groupUser.UserId))
             {
                 throw new Exception("User already exists");
             }
@@ -101,7 +102,7 @@ namespace SplitExpense.Core.Services
 
         public bool DeleteGroupUser(int groupId, int userId)
         {
-            int currentUser = 1; // Context user Id
+            int currentUser = this.ContextUser.Id;
             if (!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
             {
                 throw new Exception("Expense Group doesn't exists");

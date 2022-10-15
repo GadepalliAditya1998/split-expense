@@ -18,7 +18,7 @@ namespace SplitExpense.Controllers
         }
 
         [HttpGet("list")]
-        public IEnumerable<ExpenseGroup> GetExpenseGroups()
+        public IEnumerable<ExpenseUserGroupListItem> GetExpenseGroups()
         {
             return this.expenseGroupService.GetUserGroups(this.ContextUser.Id);
         }
@@ -48,5 +48,10 @@ namespace SplitExpense.Controllers
             return this.expenseGroupService.GetGroupUsers(groupId);
         }
 
+        [HttpDelete("{groupId}/user/{userId}")]
+        public dynamic DeleteGroupUser(int groupId, int userId)
+        {
+            return new { IsDeleted = this.expenseGroupService.DeleteGroupUser(groupId, userId) };
+        }
     }
 }

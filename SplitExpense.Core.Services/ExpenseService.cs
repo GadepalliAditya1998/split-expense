@@ -1,22 +1,23 @@
-﻿using SplitExpense.Core.Models;
+﻿using Microsoft.AspNetCore.Http;
+using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
 
 namespace SplitExpense.Core.Services
 {
-    public class ExpenseService
+    public class ExpenseService: BaseService
     {
         private readonly DatabaseContext DB;
 
-        public ExpenseService(DatabaseContext db)
+        public ExpenseService(DatabaseContext db, IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
         {
             this.DB = db;
         }
 
         public int AddExpense(AddExpense expense)
         {
-            int currentUserId = 1;
+            int currentUserId = this.ContextUser.Id;
             var expenseUsers = this.GetExpenseUser(expense).ToList();
             if (!expenseUsers.Any())
             {

@@ -52,6 +52,11 @@ namespace SplitExpense.Core.Services
             return this.DB.SingleOrDefault<User>("WHERE Id = @0 AND IsDeleted = 0", id);
         }
 
+        public IEnumerable<SearchUserListItem> GetUserConnections(int userId, string query)
+        {
+            return this.DB.Fetch<SearchUserListItem>("; EXEC [GetUserConnectionSearchResults] @@UserId = @0, @@Query = @1", userId, query);
+        }
+
 
         public string LoginUser(LoginUser loginUser)
         {
