@@ -20,6 +20,8 @@ namespace SplitExpense.Core.Models.ViewModels
 
         public DateTime ExpenseDate { get; set; }
 
+        public ExpenseSplitType SplitType { get; set; }
+
         public int PaidBy { get; set; }
 
         public string PaidByName { get; set; }

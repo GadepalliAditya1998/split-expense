@@ -27,6 +27,12 @@ namespace SplitExpense
             return this.expenseService.AddExpense(expense);
         }
 
+        [HttpPut("group/{groupId}/expense/{expenseId}/update")]
+        public bool UpdateGroupExpense(int groupId, int expenseId, AddExpense expense)
+        {
+            return this.expenseService.UpdateGroupExpense(groupId, expenseId, expense);
+        }
+
         [HttpGet("group/{groupId}/list")]
         public IEnumerable<GroupExpenseListItem> GetGroupExpenses(int groupId)
         {

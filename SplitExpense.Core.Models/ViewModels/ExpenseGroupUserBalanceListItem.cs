@@ -10,12 +10,28 @@ namespace SplitExpense.Core.Models.ViewModels
     {
         public int GroupId { get; set; }
 
-        public int Userid { get; set; }
+        public int UserId { get; set; }
 
         public string Name { get; set; }
 
-        public double DebtAmount { get; set; }
+        private double DebtAmount { get; set; }
 
-        public double LentAmount { get; set; }
+        private double LentAmount { get; set; }
+
+        public double Balance
+        {
+            get
+            {
+                return Math.Abs(this.DebtAmount - this.LentAmount);
+            }
+        }
+
+        public bool IsInDebt
+        {
+            get
+            {
+                return this.DebtAmount > this.LentAmount;
+            }
+        }
     }
 }

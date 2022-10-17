@@ -6,11 +6,11 @@ using SplitExpense.Core.Services.Core;
 
 namespace SplitExpense.Core.Services
 {
-    public class ExpenseService: BaseService
+    public class ExpenseService : BaseService
     {
         private readonly DatabaseContext DB;
 
-        public ExpenseService(DatabaseContext db, IHttpContextAccessor httpContextAccessor): base(httpContextAccessor)
+        public ExpenseService(DatabaseContext db, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             this.DB = db;
         }
@@ -102,7 +102,7 @@ namespace SplitExpense.Core.Services
                         {
                             expenseUsers.Add(new ExpenseUser()
                             {
-                                UserId =e.UserId,
+                                UserId = e.UserId,
                                 Amount = e.Amount,
                                 Balance = e.Amount,
                             });
@@ -139,6 +139,54 @@ namespace SplitExpense.Core.Services
             return this.DB.Fetch<Expense>(string.Empty);
         }
 
+        public bool UpdateGroupExpense(int groupId, int expenseId, AddExpense expense)
+        {
+            var existingExpense = this.DB.SingleOrDefault<Expense>("WHERE GroupId = @0 AND Id = @1 AND IsDeleted = @2", groupId, expenseId, false);
+            if (existingExpense != null)
+            {
+                var expenseUsers = this.DB.Fetch<ExpenseUser>("WHERE ExpenseId = @0 AND IsDeleted = @1", expenseId, false);
+
+                existingExpense.Name = expense.Name;
+                existingExpense.Description = expense.Description;
+                existingExpense.Amount = expense.Amount;
+                existingExpense.SplitType = expense.SplitType;
+
+                if (expense.SplitType == ExpenseSplitType.Equally)
+                {
+                    var sharePerUser = (expense.Amount / expenseUsers.Count());
+                    foreach (var user in expenseUsers)
+                    {
+                        var prevAmount = user.Amount;
+                        if (sharePerUser > user.Balance)
+                        {
+                            user.Balance = (prevAmount - user.Balance) + (sharePerUser - user.Balance);
+                        }
+                        user.Balance = user.Amount - sharePerUser;
+                        user.Amount = sharePerUser;
+                    }
+                }
+
+
+                try
+                {
+                    this.DB.BeginTransaction();
+                    this.DB.Update<Expense>(existingExpense, new List<string>() { "Name", "Description", "Amount", "SplitType" });
+                    this.DB.BulkUpdate<ExpenseUser>(expenseUsers, new string[] { "Amount", "Balance" });
+                    this.DB.CompleteTransaction();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    this.DB.AbortTransaction();
+                    throw;
+                }
+
+            }
+
+            return false;
+        }
+
         public bool DeleteIndividualExpense(int id)
         {
             if (!this.DB.Exists<Expense>("WHERE Id = @0 AND GroupId IS NULL AND IsDeleted = @1", id, false))
@@ -156,7 +204,20 @@ namespace SplitExpense.Core.Services
                 throw new Exception("Expense doesn't exists");
             }
 
-            return (this.DB.Update<Expense>("SET IsDeleted = @0 WHERE Id = @1 AND GroupId = @2", true, expenseid, groupId)) > 0;
+            try
+            {
+                this.DB.BeginTransaction();
+                this.DB.Update<Expense>("SET IsDeleted = @0 WHERE Id = @1 AND GroupId = @2", true, expenseid, groupId);
+                this.DB.Update<ExpenseUser>("SET IsDeleted = @0, DateDeleted = @1 WHERE ExpenseId = @2", true, DateTime.UtcNow, expenseid);
+                this.DB.CompleteTransaction();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.DB.AbortTransaction();
+                throw;
+            }
         }
     }
 }

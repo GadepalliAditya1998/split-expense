@@ -53,5 +53,11 @@ namespace SplitExpense.Controllers
         {
             return new { IsDeleted = this.expenseGroupService.DeleteGroupUser(groupId, userId) };
         }
+
+        [HttpPost("{groupId}/recordPayment")]
+        public PaymentTransaction RecordPaymentTransaction(int groupId, AddPaymentTransaction addPaymentTransaction)
+        {
+            return this.expenseGroupService.RecordGroupExpensePayment(groupId, addPaymentTransaction);
+        }
     }
 }

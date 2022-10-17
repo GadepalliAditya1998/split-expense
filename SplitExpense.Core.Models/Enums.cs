@@ -18,4 +18,12 @@ namespace SplitExpense.Core.Models
         App,
         Group
     }
+
+    public enum PaymentMode
+    {
+        Cash,
+        UPI,
+        BankTransfer,
+        Cheque,
+    }
 }

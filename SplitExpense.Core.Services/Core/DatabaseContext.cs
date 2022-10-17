@@ -82,6 +82,24 @@ namespace SplitExpense.Core.Services.Core
             }
         }
 
+        public void BulkUpdate<T>(IEnumerable<T> data, params string[] args)
+        {
+            try
+            {
+                this.db.BeginTransaction();
+                foreach (var record in data)
+                {
+                    this.db.Update(record, args.ToList());
+                }
+                this.db.CompleteTransaction();
+            }
+            catch (Exception e)
+            {
+                this.db.AbortTransaction();
+                throw;
+            }
+        }
+
         public void BeginTransaction()
         {
             this.db.BeginTransaction();

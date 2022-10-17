@@ -60,8 +60,8 @@ TGE.[ExpenseDate],
 TGE.[PaidByUser] AS PaidBy,
 CONCAT(U.FirstName, ' ', U.LastName) AS PaidByName,
 TGE.[Amount] AS PaidAmount,
-(TGE.Amount - TUE.Amount) AS ToBePaidAmount,
-TGE.CreatedOn,
+(CASE WHEN TGE.PaidByUser = @UserId THEN (TGE.Amount - TUE.Amount) ELSE TUE.Amount END)  AS ToBePaidAmount,
+TGE.[SplitType],
 (CASE WHEN TGE.PaidByUser = @UserId THEN 1 ELSE 0 END) AS IsLent
 FROM 
 #tmpGroupExpenses TGE

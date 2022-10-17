@@ -115,5 +115,35 @@ namespace SplitExpense.Core.Services
 
             return this.DB.Update<ExpenseGroupUser>("SET IsDeleted = @0 WHERE GroupId = @1 AND UserId = @2", true, groupId, userId) > 0;
         }
+
+        public PaymentTransaction RecordGroupExpensePayment(int groupId, AddPaymentTransaction addPaymentTransaction)
+        {
+            if(!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
+            {
+                throw new Exception("Group doesn't exists");
+            }
+
+            var expenseGroupUserIds = this.DB.Fetch<int>("SELECT UserId FROM [ExpenseGroupUsers] WHERE GroupId = @0 AND IsDeleted = @1", groupId, false);
+            if (!(expenseGroupUserIds.Any(e => e == addPaymentTransaction.PaidByUserId) && expenseGroupUserIds.Any(e => e == addPaymentTransaction.PaidToUserId)))
+            {
+                throw new Exception("User doesn't exists");
+            }
+
+            var paymentTransaction = new PaymentTransaction()
+            {
+                PaymentDate = DateTime.UtcNow,
+                TransactionIdentifier = Guid.NewGuid(),
+                PaidByUserId = addPaymentTransaction.PaidByUserId,
+                PaidToUserId = addPaymentTransaction.PaidToUserId,
+                PaymentMode = addPaymentTransaction.PaymentMode,
+                Amount = addPaymentTransaction.Amount,
+                GroupId = groupId,
+            };
+
+            var id = this.DB.Insert(paymentTransaction);
+            paymentTransaction.Id = id;
+
+            return paymentTransaction;
+        }
     }
 }
