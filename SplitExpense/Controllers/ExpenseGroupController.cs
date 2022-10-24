@@ -59,5 +59,11 @@ namespace SplitExpense.Controllers
         {
             return this.expenseGroupService.RecordGroupExpensePayment(groupId, addPaymentTransaction);
         }
+
+        [HttpGet("{groupId}/payments")]
+        public IEnumerable<PaymentTransactionListItem> GetGroupPaymentTransactions(int groupId)
+        {
+            return this.expenseGroupService.GetGroupPaymentTransactions(groupId);
+        }
     }
 }

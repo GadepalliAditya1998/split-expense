@@ -14,23 +14,32 @@ namespace SplitExpense.Core.Models.ViewModels
 
         public string Name { get; set; }
 
-        private double DebtAmount { get; set; }
+        private double TotalOwingAmount { get; set; }
 
-        private double LentAmount { get; set; }
+        private double TotalLentAmount { get; set; }
+
+        private double PaidAmount { get; set; }
+
+        private double AmountReturned { get; set; }
+
+        private bool isInDebt;
 
         public double Balance
         {
             get
             {
-                return Math.Abs(this.DebtAmount - this.LentAmount);
+                var balance = (TotalLentAmount + PaidAmount) - (TotalOwingAmount + AmountReturned);
+                this.isInDebt = balance < 0;
+                return Math.Abs(balance);
             }
         }
+
 
         public bool IsInDebt
         {
             get
             {
-                return this.DebtAmount > this.LentAmount;
+                return isInDebt;
             }
         }
     }

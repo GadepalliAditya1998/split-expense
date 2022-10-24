@@ -3,6 +3,7 @@ using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
+using SplitExpense.Core.Services.Extensions;
 
 namespace SplitExpense.Core.Services
 {
@@ -24,6 +25,16 @@ namespace SplitExpense.Core.Services
                 throw new Exception("Group has no members");
             }
 
+            if(!expenseUsers.Any(e=> e.UserId == currentUserId))
+            {
+                expenseUsers.Add(new ExpenseUser()
+                {
+                    Amount = 0,
+                    Balance = 0,
+                    UserId = currentUserId
+                });
+            }
+
             try
             {
                 this.DB.BeginTransaction();
@@ -37,7 +48,7 @@ namespace SplitExpense.Core.Services
                     SplitType = expense.SplitType,
                     PaidByUser = currentUserId,
                     UserId = currentUserId,
-                    ExpenseDate = DateTime.UtcNow,
+                    ExpenseDate = expense.ExpenseDate,
                 };
 
                 int expenseId = this.DB.Insert(newExpense);
@@ -121,7 +132,30 @@ namespace SplitExpense.Core.Services
                 throw new Exception("Group doesn't exists");
             }
 
-            return this.DB.Fetch<GroupExpenseListItem>(";EXEC [GetGroupExpenseListItems] @@GroupId = @0, @@UserId = @1", groupId, userId);
+            var listItem = this.DB.Fetch<GroupExpenseListItem>(";EXEC [GetGroupExpenseListItems] @@GroupId = @0, @@UserId = @1", groupId, userId);
+            var expenseUserShares = new List<ExpenseUser>();
+            if (listItem.Any())
+            {
+                var ids = listItem.Where(l=> l.SplitType != ExpenseSplitType.Equally).Select(e => e.ExpenseId).ToCSV();
+                if(ids.Any())
+                {
+                    expenseUserShares = this.DB.Fetch<ExpenseUser>("WHERE ExpenseId IN (" + ids + ") AND IsDeleted = @2", ids, userId, false).ToList();
+                    var expenseListItemMap = listItem.ToDictionary(l => l.ExpenseId);
+                    expenseUserShares.ForEach(e =>
+                    {
+                        if (expenseListItemMap.ContainsKey(e.ExpenseId))
+                        {
+                            expenseListItemMap[e.ExpenseId].UserShares.Add(new ExpenseUserShare()
+                            {
+                                UserId = e.UserId,
+                                Amount = e.Amount
+                            });
+                        }
+                    });
+                }
+            }
+
+            return listItem;
         }
 
         public IEnumerable<ExpenseGroupUserBalanceListItem> GetGroupUserWiseBalances(int groupId, int userId)
@@ -144,7 +178,11 @@ namespace SplitExpense.Core.Services
             var existingExpense = this.DB.SingleOrDefault<Expense>("WHERE GroupId = @0 AND Id = @1 AND IsDeleted = @2", groupId, expenseId, false);
             if (existingExpense != null)
             {
+                var groupUsers = this.DB.Fetch<ExpenseGroupUser>("WHERE GroupId = @0 AND IsDeleted = @1", groupId, false);
+
                 var expenseUsers = this.DB.Fetch<ExpenseUser>("WHERE ExpenseId = @0 AND IsDeleted = @1", expenseId, false);
+                var expenseUsersToInsert = new List<ExpenseUser>();
+                var expenseUsersToDelete = new List<ExpenseUser>();
 
                 existingExpense.Name = expense.Name;
                 existingExpense.Description = expense.Description;
@@ -156,13 +194,38 @@ namespace SplitExpense.Core.Services
                     var sharePerUser = (expense.Amount / expenseUsers.Count());
                     foreach (var user in expenseUsers)
                     {
-                        var prevAmount = user.Amount;
-                        if (sharePerUser > user.Balance)
-                        {
-                            user.Balance = (prevAmount - user.Balance) + (sharePerUser - user.Balance);
-                        }
-                        user.Balance = user.Amount - sharePerUser;
                         user.Amount = sharePerUser;
+                    }
+
+                    var userToInsert = groupUsers.Where(user => !expenseUsers.Any(eu => eu.UserId == user.UserId));
+                    foreach(var user in userToInsert)
+                    {
+                        expenseUsersToInsert.Add(new ExpenseUser()
+                        {
+                            Amount = sharePerUser,
+                            UserId = user.UserId,
+                            ExpenseId = expenseId,
+                        }) ;
+                    }
+                }
+                else if(expense.SplitType == ExpenseSplitType.Custom)
+                {
+                    expenseUsersToDelete = expenseUsers.Where(user => !expense.ExpenseUsers.Any(eu=> eu.UserId == user.UserId)).ToList();
+                    expenseUsersToInsert = expense.ExpenseUsers.Where(user => !expenseUsers.Any(eu => eu.UserId == user.UserId))
+                                                                .Select(user =>
+                                                                {
+                                                                   return new ExpenseUser()
+                                                                    {
+                                                                        ExpenseId = expenseId,
+                                                                        Amount = user.Amount,
+                                                                        UserId = user.UserId
+                                                                    };
+                                                                }).ToList();
+                    expenseUsers = expenseUsers.Where(user => expense.ExpenseUsers.Any(e => e.UserId == user.UserId)).ToList();
+                    var userMap = expense.ExpenseUsers.ToDictionary(user => user.UserId);
+                    foreach(var user in expenseUsers)
+                    {
+                        user.Amount = userMap[user.UserId].Amount;
                     }
                 }
 
@@ -172,6 +235,12 @@ namespace SplitExpense.Core.Services
                     this.DB.BeginTransaction();
                     this.DB.Update<Expense>(existingExpense, new List<string>() { "Name", "Description", "Amount", "SplitType" });
                     this.DB.BulkUpdate<ExpenseUser>(expenseUsers, new string[] { "Amount", "Balance" });
+                    this.DB.BulkInsert<ExpenseUser>(expenseUsersToInsert);
+                    if(expenseUsersToDelete.Any())
+                    {
+                        this.DB.Update<ExpenseUser>("SET IsDeleted = 1 WHERE Id IN (@0)", expenseUsersToDelete.Select(e => e.Id).ToCSV());
+                    }
+
                     this.DB.CompleteTransaction();
 
                     return true;

@@ -23,6 +23,8 @@ namespace SplitExpense.Core.Models.ViewModels
 
         public double Amount { get; set; }
 
+        public DateTime ExpenseDate { get; set; }
+
         public List<ExpenseUserShare> ExpenseUsers { get; set; }
     }
 }

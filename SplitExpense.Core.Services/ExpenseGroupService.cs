@@ -145,5 +145,10 @@ namespace SplitExpense.Core.Services
 
             return paymentTransaction;
         }
+
+        public IEnumerable<PaymentTransactionListItem> GetGroupPaymentTransactions(int groupId)
+        {
+            return this.DB.Fetch<PaymentTransactionListItem>("WHERE GroupId = @0", groupId);
+        }
     }
 }

@@ -8,6 +8,13 @@ namespace SplitExpense.Core.Models.ViewModels
 {
     public class GroupExpenseListItem
     {
+        public GroupExpenseListItem()
+        {
+            this.Name = string.Empty;
+            this.PaidByName = string.Empty;
+            this.UserShares = new List<ExpenseUserShare>();
+        }
+
         public int ExpenseId { get; set; }
 
         public int GroupId { get; set; }
@@ -31,5 +38,7 @@ namespace SplitExpense.Core.Models.ViewModels
         public double ToBePaidAmount { get; set; }
 
         public bool IsLent { get; set; }
+
+        public IList<ExpenseUserShare> UserShares { get; set; }
     }
 }
