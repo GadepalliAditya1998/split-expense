@@ -69,7 +69,7 @@ namespace SplitExpense.Core.Services
             return this.DB.Exists<UserInvite>("WHERE ReferralId = @0 AND ReferralType = @1 AND IsDeleted = @2", inviteId, InviteType.App, false);
         }
 
-        public bool VerifyGroupInvite(string inviteId)
+        public bool VerifyGroupInvite(Guid inviteId)
         {
             return this.DB.Exists<UserInvite>("WHERE ReferralId = @0 AND ReferralType = @1 AND ExpiresOn > @2 AND IsDeleted = @3", inviteId, InviteType.Group, DateTime.UtcNow.Date,  false);
         }

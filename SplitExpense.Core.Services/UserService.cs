@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SplitExpense.Core.Models;
+using SplitExpense.Core.Models.Core;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,6 +29,7 @@ namespace SplitExpense.Core.Services
                 throw new Exception("User already exists");
             }
 
+            var userConnections = new List<UserConnection>();
             var newUser = new Database.User()
             {
                 FirstName = user.FirstName,
@@ -35,11 +37,49 @@ namespace SplitExpense.Core.Services
                 MiddleName = user.MiddleName,
                 Email = user.Email,
                 DateOfBirth = user.DateOfBirth,
-                ReferralId = user.ReferralId,
                 Password = UtilityService.GetHashPassword(user.Password),
+                IsActive = true,
             };
 
-            return this.DB.Insert(newUser);
+            if(user.ReferralId.HasValue)
+            {
+                var referral = this.DB.SingleOrDefault<UserInvite>("WHERE ReferralId = @0 AND ExpiresOn > @1 AND ReferralType = @2 AND IsDeleted = @3", user.ReferralId.Value, DateTime.UtcNow, InviteType.App, false);
+                if (referral != null)
+                {
+                    newUser.ReferralId = referral.Id;
+                    userConnections.Add(new UserConnection()
+                    {
+                        UserId = referral.UserId,
+                    });
+
+                    userConnections.Add(new UserConnection()
+                    {
+                        ConnectedUserId = referral.UserId,
+                    });
+                }                
+            }
+
+            try
+            {
+                this.DB.BeginTransaction();
+
+                var userId = this.DB.Insert(newUser);
+                if (userConnections.Any())
+                {
+                    userConnections[0].ConnectedUserId = userId;
+                    userConnections[1].UserId = userId;
+                }
+                this.DB.BulkInsert(userConnections);
+
+                this.DB.CompleteTransaction();
+
+                return userId;
+            }
+            catch(Exception ex)
+            {
+                this.DB.AbortTransaction();
+                throw new Exception("Error in creating User");
+            }
         }
 
         public bool DoesUserExists(User user)

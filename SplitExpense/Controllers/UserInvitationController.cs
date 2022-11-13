@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SplitExpense.Core.Services;
 
 namespace SplitExpense.Controllers
@@ -25,6 +26,7 @@ namespace SplitExpense.Controllers
             return new { InviteLink = this.userInviteService.GetGroupUserInvite(this.ContextUser.Id, groupId) };
         }
 
+        [AllowAnonymous]
         [HttpGet("app/{inviteId}/verify")]
         public bool VerifyAppInvite(string inviteId)
         {
@@ -34,7 +36,7 @@ namespace SplitExpense.Controllers
         [HttpGet("group/{inviteId}/verify")]
         public bool VerifyGroupInvite(string inviteId)
         {
-            return this.userInviteService.VerifyGroupInvite(inviteId);
+            return this.userInviteService.VerifyGroupInvite(Guid.Parse(inviteId));
         }
     }
 }

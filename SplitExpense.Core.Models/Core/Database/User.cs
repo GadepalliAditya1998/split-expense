@@ -16,7 +16,7 @@
 
         public string Password { get; set; }
 
-        public Guid? ReferralId { get; set; }
+        public int? ReferralId { get; set; }
 
         public bool IsActive { get; set; }
     }
