@@ -5,6 +5,8 @@ using SplitExpense.Core.Services;
 using SplitExpense.Core.Services.Core;
 using SplitExpense.Core.MiddleWare;
 using System.Text;
+using SplitExpense.Core.Services.Core.Notifications;
+using SplitExpense.Core.Services.Core.Notifications.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,4 +103,6 @@ void ConfigireServices()
     builder.Services.AddScoped<ExpenseGroupService>();
     builder.Services.AddScoped<UserService>();
     builder.Services.AddScoped<UserInviteService>();
+    builder.Services.AddScoped<NotificationService>();
+    builder.Services.AddScoped<EventManager>();
 }

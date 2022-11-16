@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
+using SplitExpense.Core.Models.Core.Notifications;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
+using SplitExpense.Core.Services.Core.Notifications.Events;
 using SplitExpense.Core.Services.Extensions;
 
 namespace SplitExpense.Core.Services
@@ -11,9 +13,12 @@ namespace SplitExpense.Core.Services
     {
         private readonly DatabaseContext DB;
 
-        public ExpenseService(DatabaseContext db, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        private readonly EventManager eventManager;
+
+        public ExpenseService(DatabaseContext db, EventManager eventManager, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             this.DB = db;
+            this.eventManager = eventManager;
         }
 
         public int AddExpense(AddExpense expense)

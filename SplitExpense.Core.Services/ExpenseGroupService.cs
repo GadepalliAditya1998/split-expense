@@ -3,6 +3,7 @@ using SplitExpense.Core.Models;
 using SplitExpense.Core.Models.Core;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services.Core;
+using SplitExpense.Core.Services.Core.Notifications.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +12,16 @@ using System.Threading.Tasks;
 
 namespace SplitExpense.Core.Services
 {
-    public class ExpenseGroupService: BaseService
+    public class ExpenseGroupService : BaseService
     {
         private readonly DatabaseContext DB;
 
-        public ExpenseGroupService(DatabaseContext db, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        private readonly EventManager eventManager;
+
+        public ExpenseGroupService(DatabaseContext db, EventManager eventManager, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             this.DB = db;
+            this.eventManager = eventManager;
         }
 
         public IEnumerable<ExpenseUserGroupListItem> GetUserGroups(int userId)
@@ -97,7 +101,10 @@ namespace SplitExpense.Core.Services
 
             groupUser.GroupId = groupId;
 
-            return this.DB.Insert(groupUser);
+            var groupUserId = this.DB.Insert(groupUser);
+            this.eventManager.TriggerUserAddedToGroupNotification(groupId, new List<int>() { groupUser.UserId });
+
+            return groupUserId;
         }
 
         public bool DeleteGroupUser(int groupId, int userId)
@@ -108,7 +115,7 @@ namespace SplitExpense.Core.Services
                 throw new Exception("Expense Group doesn't exists");
             }
 
-            if (!this.DB.Exists<ExpenseGroupUser>("WHERE Id = @0 AND IsDeleted = @1 AND UserId = @2 AND IsAdmin = @3", groupId, false, currentUser, true))
+            if (!this.DB.Exists<ExpenseGroupUser>("WHERE GroupId = @0 AND IsDeleted = @1 AND UserId = @2 AND IsAdmin = @3", groupId, false, currentUser, true))
             {
                 throw new Exception("You don't have privileges to remove a user");
             }
@@ -118,7 +125,7 @@ namespace SplitExpense.Core.Services
 
         public PaymentTransaction RecordGroupExpensePayment(int groupId, AddPaymentTransaction addPaymentTransaction)
         {
-            if(!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
+            if (!this.DB.Exists<ExpenseGroup>("WHERE Id = @0 AND IsDeleted = @1", groupId, false))
             {
                 throw new Exception("Group doesn't exists");
             }
