@@ -92,9 +92,44 @@ namespace SplitExpense.Core.Services
             return this.DB.SingleOrDefault<User>("WHERE Id = @0 AND IsDeleted = 0", id);
         }
 
-        public IEnumerable<SearchUserListItem> GetUserConnections(int userId, string query)
+        public IEnumerable<SearchConnectionUserListItem> GetUserConnectionSearchResults(int userId, string query)
         {
-            return this.DB.Fetch<SearchUserListItem>("; EXEC [GetUserConnectionSearchResults] @@UserId = @0, @@Query = @1", userId, query);
+            return this.DB.Fetch<SearchConnectionUserListItem>("; EXEC [GetUserConnectionSearchResults] @@UserId = @0, @@Query = @1", userId, query);
+        }
+
+        public IEnumerable<UserConnectionListItem> GetUserConnections(int userId)
+        {
+            return this.DB.Fetch<UserConnectionListItem>("; EXEC [GetUserConnectionListItems] @@UserId = @0", userId);
+        }
+
+        public IEnumerable<UserSearchResultItem> GetUserSearchResultItems(int userId, string query) 
+        {
+            return this.DB.Fetch<UserSearchResultItem>("; EXEC [GetUserSearchResult] @@UserId = @0, @@Query = @1", userId, query);
+        }
+
+        public bool AddUserConnection(int userId, UserConnection userConnection)
+        {
+            if(this.DB.Exists<UserConnection>("WHERE UserId = @0 AND ConnectedUserId = @1 AND IsDeleted = @2", userId, userConnection.ConnectedUserId, false))
+            {
+                throw new Exception("User is already connected");
+            }
+
+            var userConnections = new List<UserConnection>();
+            userConnections.Add(new UserConnection()
+            {
+                UserId = userId,
+                ConnectedUserId = userConnection.ConnectedUserId
+            });
+
+            userConnections.Add(new UserConnection()
+            {
+                UserId = userConnection.ConnectedUserId,
+                ConnectedUserId = userId
+            });
+
+            this.DB.BulkInsert(userConnections);
+
+            return true;
         }
 
 

@@ -14,10 +14,16 @@ namespace SplitExpense.Controllers
             this.userService = userService;
         }
 
-        [HttpGet("users")]
-        public IEnumerable<SearchUserListItem> GetUserConnections(string query)
+        [HttpGet("users/connections")]
+        public IEnumerable<SearchConnectionUserListItem> GetUserConnections(string query)
         {
-            return this.userService.GetUserConnections(this.ContextUser.Id, query);
+            return this.userService.GetUserConnectionSearchResults(this.ContextUser.Id, query);
+        }
+
+        [HttpGet("users")]
+        public IEnumerable<UserSearchResultItem> GetUserSearchResults(string query)
+        {
+            return this.userService.GetUserSearchResultItems(this.ContextUser.Id, query);
         }
     }
 }

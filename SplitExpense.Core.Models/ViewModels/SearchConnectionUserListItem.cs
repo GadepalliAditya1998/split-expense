@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SplitExpense.Core.Models.ViewModels
 {
-    public class SearchUserListItem
+    public class SearchConnectionUserListItem
     {
         public int Id { get; set; }
 
