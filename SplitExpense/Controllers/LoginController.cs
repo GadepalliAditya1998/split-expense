@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SplitExpense.Core.Exceptions;
 using SplitExpense.Core.Models.ViewModels;
 using SplitExpense.Core.Services;
 using SplitExpense.Core.Services.Core;

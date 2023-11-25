@@ -3,16 +3,22 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SplitExpense.Core.Services;
 using SplitExpense.Core.Services.Core;
-using SplitExpense.Core.MiddleWare;
 using System.Text;
 using SplitExpense.Core.Services.Core.Notifications;
 using SplitExpense.Core.Services.Core.Notifications.Events;
+using SplitExpense.Core.Filters;
+using SplitExpense.Core.Middleware;
+using SplitExpense.Core.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers((options) =>
+{
+    options.Filters.Add<AuthorizeApiFilter>();
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -85,7 +91,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<JwtMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseCors();
 
@@ -97,6 +103,7 @@ app.Run();
 void ConfigireServices()
 {
     builder.Services.AddScoped<DatabaseContext>(db => new DatabaseContext(builder.Configuration.GetConnectionString("DefaultConnectionString")));
+    builder.Services.AddScoped<IAuthTokenHandler, AuthTokenHandler>();
     builder.Services.AddSingleton<IConfiguration>(c => builder.Configuration);
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddScoped<ExpenseService>();
@@ -105,4 +112,11 @@ void ConfigireServices()
     builder.Services.AddScoped<UserInviteService>();
     builder.Services.AddScoped<NotificationService>();
     builder.Services.AddScoped<EventManager>();
+
+    ConfigureMiddleWareServices();
+}
+
+void ConfigureMiddleWareServices()
+{
+    builder.Services.AddTransient<ExceptionMiddleware>();
 }
